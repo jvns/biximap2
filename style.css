@@ -113,6 +113,20 @@ h3 {
     margin-bottom: .5rem;
 }
 
+.marker.marker-tiny.marker-tiny {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+}
+
+.marker.marker-tiny.marker-tiny:after {
+    display:none;
+}
+.marker.marker-tiny.marker-tiny:before {
+    display:none;
+}
+
+
 
 /* 
 

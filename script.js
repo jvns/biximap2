@@ -12,7 +12,10 @@ map.on("load", setup);
 function setup() {
   geolocate();
   update();
+  map.on("zoom", () => addStations(GEOJSON));
 }
+
+window.GEOJSON = undefined;
 
 function geolocate() {
   map.addControl(
@@ -49,6 +52,10 @@ function createMarker(feature) {
   }
   if (station.ebikes_available >= 3) {
     el.className += " marker-many-ebikes";
+  }
+  /* if zoomed out, show tiny markers */
+  if (map.getZoom() < 14) {
+    el.className += " marker-tiny";
   }
 
   // make a marker for each feature and add to the map
@@ -112,11 +119,11 @@ async function update() {
   const response = await fetch(
     "https://layer.bicyclesharing.net/map/v1/mtl/map-inventory",
   );
-  const geojson = await response.json();
-  addStations(geojson);
+  window.GEOJSON = await response.json();
+  addStations(GEOJSON);
   /* every 10 seconds for 2 minutes, refresh the data */
   for (let i = 0; i < 12; i++) {
     await sleep(10);
-    addStations(geojson);
+    addStations(GEOJSON);
   }
 }
