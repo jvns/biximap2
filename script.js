@@ -106,17 +106,17 @@ function sleep(seconds) {
 }
 
 async function update() {
-  while (true) {
-    console.log("refreshing...");
-    const response = await fetch(
-      "https://layer.bicyclesharing.net/map/v1/mtl/map-inventory",
-    );
-    const geojson = await response.json();
+  setTimeout(update, 120 * 1000); /* run every 2 minutes */
+
+  console.log("refreshing...");
+  const response = await fetch(
+    "https://layer.bicyclesharing.net/map/v1/mtl/map-inventory",
+  );
+  const geojson = await response.json();
+  addStations(geojson);
+  /* every 10 seconds for 2 minutes, refresh the data */
+  for (let i = 0; i < 12; i++) {
+    await sleep(10);
     addStations(geojson);
-    /* every 10 seconds for 2 minutes, refresh the data */
-    for (let i = 0; i < 12; i++) {
-      await sleep(10);
-      addStations(geojson);
-    }
   }
 }
