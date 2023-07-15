@@ -39,6 +39,9 @@ async function addStations() {
     // create a HTML element for each feature
     const el = document.createElement("div");
     const station = feature.properties.station;
+    if (!station) {
+      continue;
+    }
     el.className = "marker";
     if (station.bikes_available === 0) {
       el.className += " marker-empty marker-problem";
