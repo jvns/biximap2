@@ -79,5 +79,6 @@ async function addStations() {
             `,
         ),
     ).addTo(map);
+    /* close popup on escape */
   }
 }

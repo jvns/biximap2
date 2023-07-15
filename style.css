@@ -14,7 +14,7 @@
   background-color: white;
 }
 
-.marker-warning:after, .marker-problem:after {
+.marker-warning:before, .marker-problem:before {
   position: absolute;
   top: 50%;
   bottom: 0;
@@ -28,32 +28,37 @@
     border-color: red;
 }
 
-.marker-problem:after {
+.marker-problem:before {
     background-color: red;
 }
 
-.marker.marker-ebike:before {
+.marker.marker-ebike:after {
     content: "↯";
     color: white;
   font-size: 1rem;
-  margin: auto;
+  margin: 7px auto;
+  z-index: 1;
+}
+
+.marker.marker-ebike.marker-low:after {
+    color: orange;
 }
 
 /* colours for various different bike station fullness */
 
-.marker-empty:after {
+.marker-empty:before {
   top: 100%;
 }
 
-.marker-low:after {
+.marker-low:before {
   top: 80%;
 }
 
-.marker-docks-low:after {
+.marker-docks-low:before {
   top: 20%;
 }
 
-.marker-full:after {
+.marker-full:before {
   top: 0%;
 }
 
@@ -102,7 +107,7 @@ h3 {
 
 /* 
 
-.marker-ebike::after {
+.marker-ebike::before {
   position: absolute;
   display: block;
   width: 1.2rem;
