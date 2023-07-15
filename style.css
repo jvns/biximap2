@@ -2,40 +2,61 @@
   background-image: url('mapbox-icon.png');
   background-size: cover;
   background-color: green;
-  width: 30px;
+  width: 10px;
   height: 30px;
-  border-radius: 50%;
+  /* border-radius: 50%; */
   cursor: pointer;
+  border: 2px solid green;
 }
 
-.marker.marker-ebike:after {
+.marker-warning, .marker-problem {
+    border-color: orange;
+  background-color: white;
+}
+
+.marker-warning:after, .marker-problem:after {
+  position: absolute;
+  top: 50%;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: orange;
+  content: ' ';
+}
+
+.marker-problem {
+    border-color: red;
+}
+
+.marker-problem:after {
+    background-color: red;
+}
+
+.marker.marker-ebike:before {
     content: "↯";
     color: white;
+  font-size: 1rem;
+  margin: auto;
 }
 
 /* colours for various different bike station fullness */
 
-.marker-low {
-    background-color: orange;
+.marker-empty:after {
+  top: 100%;
 }
 
-
-.marker-docks-low {
-    background-color: blue;
+.marker-low:after {
+  top: 80%;
 }
 
-.marker-empty {
-    background-color: red;
+.marker-docks-low:after {
+  top: 20%;
 }
 
-.marker-full {
-    background-color: purple;
+.marker-full:after {
+  top: 0%;
 }
 
-.marker-ebike::after {
-  font-size: 1rem;
-  margin: auto;
-}
 
 .marker-ebike {
   display: flex;

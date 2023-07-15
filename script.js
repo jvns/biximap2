@@ -41,16 +41,13 @@ async function addStations() {
     const station = feature.properties.station;
     el.className = "marker";
     if (station.bikes_available === 0) {
-      el.className += " marker-empty";
-    }
-    if (station.docks_available === 0) {
-      el.className += " marker-full";
-    }
-    if (station.bikes_available < 3) {
-      el.className += " marker-low";
-    }
-    if (station.docks_available < 3) {
-      el.className += " marker-docks-low";
+      el.className += " marker-empty marker-problem";
+    } else if (station.docks_available === 0) {
+      el.className += " marker-full marker-problem";
+    } else if (station.bikes_available < 3) {
+      el.className += " marker-low marker-warning";
+    } else if (station.docks_available < 3) {
+      el.className += " marker-docks-low marker-warning";
     }
     if (station.ebikes_available > 0) {
       el.className += " marker-ebike";
