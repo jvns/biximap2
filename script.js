@@ -54,7 +54,7 @@ function createMarker(feature) {
     el.className += " marker-many-ebikes";
   }
   /* if zoomed out, show tiny markers */
-  if (map.getZoom() < 14) {
+  if (map.getZoom() < 12) {
     el.className += " marker-tiny";
   }
 
