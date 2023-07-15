@@ -12,7 +12,20 @@ map.on("load", setup);
 function setup() {
   geolocate();
   update();
-  map.on("zoom", () => addStations(GEOJSON));
+  //map.on("zoomend", zoom);
+}
+
+function zoom() {
+  let zoom_status = undefined;
+  if (map.getZoom() < 13) {
+    zoom_status = "zoomed_out";
+  } else {
+    zoom_status = "zoomed_in";
+  }
+  if (window.zoom_status !== zoom_status) {
+    addStations(GEOJSON);
+    window.zoom_status = zoom_status;
+  }
 }
 
 window.GEOJSON = undefined;
@@ -53,10 +66,11 @@ function createMarker(feature) {
   if (station.ebikes_available >= 3) {
     el.className += " marker-many-ebikes";
   }
-  /* if zoomed out, show tiny markers */
+  /* if zoomed out, show tiny markers
   if (map.getZoom() < 13) {
     el.className += " marker-tiny";
   }
+  */
 
   // make a marker for each feature and add to the map
   new mapboxgl.Marker(el).setLngLat(feature.geometry.coordinates).setPopup(
@@ -126,4 +140,5 @@ async function update() {
     await sleep(10);
     addStations(GEOJSON);
   }
+  geolocate();
 }
