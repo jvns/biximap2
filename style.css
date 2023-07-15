@@ -35,9 +35,13 @@
 .marker.marker-ebike:after {
     content: "↯";
     color: white;
-  font-size: 1rem;
+    font-size: .8rem;
   margin: 7px auto;
   z-index: 1;
+}
+
+.marker.marker-many-ebikes:after {
+    content: "↯↯";
 }
 
 .marker.marker-ebike.marker-low:after {

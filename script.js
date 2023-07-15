@@ -55,6 +55,9 @@ async function addStations() {
     if (station.ebikes_available > 0) {
       el.className += " marker-ebike";
     }
+    if (station.ebikes_available >= 3) {
+      el.className += " marker-many-ebikes";
+    }
 
     // make a marker for each feature and add to the map
     new mapboxgl.Marker(el).setLngLat(feature.geometry.coordinates).setPopup(
