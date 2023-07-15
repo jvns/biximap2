@@ -9,9 +9,6 @@ const map = new mapboxgl.Map({
 
 map.on("load", setup);
 // start loading inventory asap
-const inventory = fetch(
-  "https://layer.bicyclesharing.net/map/v1/mtl/map-inventory",
-);
 
 function setup() {
   geolocate();
@@ -32,38 +29,34 @@ function geolocate() {
   );
 }
 
-async function addStations() {
-  const response = await inventory;
-  const geojson = await response.json();
-  for (const feature of geojson.features) {
-    // create a HTML element for each feature
-    const el = document.createElement("div");
-    const station = feature.properties.station;
-    if (!station) {
-      continue;
-    }
-    el.className = "marker";
-    if (station.bikes_available === 0) {
-      el.className += " marker-empty marker-problem";
-    } else if (station.docks_available === 0) {
-      el.className += " marker-full marker-problem";
-    } else if (station.bikes_available <= 3) {
-      el.className += " marker-low marker-warning";
-    } else if (station.docks_available <= 3) {
-      el.className += " marker-docks-low marker-warning";
-    }
-    if (station.ebikes_available > 0) {
-      el.className += " marker-ebike";
-    }
-    if (station.ebikes_available >= 3) {
-      el.className += " marker-many-ebikes";
-    }
+function createMarker(feature) {
+  const el = document.createElement("div");
+  const station = feature.properties.station;
+  if (!station) {
+    return;
+  }
+  el.className = "marker";
+  if (station.bikes_available === 0) {
+    el.className += " marker-empty marker-problem";
+  } else if (station.docks_available === 0) {
+    el.className += " marker-full marker-problem";
+  } else if (station.bikes_available <= 3) {
+    el.className += " marker-low marker-warning";
+  } else if (station.docks_available <= 3) {
+    el.className += " marker-docks-low marker-warning";
+  }
+  if (station.ebikes_available > 0) {
+    el.className += " marker-ebike";
+  }
+  if (station.ebikes_available >= 3) {
+    el.className += " marker-many-ebikes";
+  }
 
-    // make a marker for each feature and add to the map
-    new mapboxgl.Marker(el).setLngLat(feature.geometry.coordinates).setPopup(
-      new mapboxgl.Popup({ offset: 25 }) // add popups
-        .setHTML(
-          `<h3>${station.name}</h3><p>
+  // make a marker for each feature and add to the map
+  new mapboxgl.Marker(el).setLngLat(feature.geometry.coordinates).setPopup(
+    new mapboxgl.Popup({ offset: 25 }) // add popups
+      .setHTML(
+        `<h3>${station.name}</h3><p>
             <div class="info">
                <div class="info__item">
                   <div class="num"> ${station.bikes_available} </div>
@@ -80,8 +73,14 @@ async function addStations() {
             </div>
 
             `,
-        ),
-    ).addTo(map);
-    /* close popup on escape */
+      ),
+  ).addTo(map);
+}
+
+async function addStations() {
+  const response = await inventory;
+  const geojson = await response.json();
+  for (const feature of geojson.features) {
+    createMarker(feature);
   }
 }
