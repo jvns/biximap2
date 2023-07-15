@@ -1,0 +1,98 @@
+.marker {
+  background-image: url('mapbox-icon.png');
+  background-size: cover;
+  background-color: green;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.marker.marker-ebike:after {
+    content: "↯";
+    color: white;
+}
+
+/* colours for various different bike station fullness */
+
+.marker-low {
+    background-color: orange;
+}
+
+
+.marker-docks-low {
+    background-color: blue;
+}
+
+.marker-empty {
+    background-color: red;
+}
+
+.marker-full {
+    background-color: purple;
+}
+
+.marker-ebike::after {
+  font-size: 1rem;
+  margin: auto;
+}
+
+.marker-ebike {
+  display: flex;
+}
+
+.mapboxgl-popup {
+  max-width: 200px;
+}
+
+.mapboxgl-popup-content {
+  font-family: 'Open Sans', sans-serif;
+}
+
+.info {
+    display: flex;
+    justify-content: center;
+}
+
+.info__item {
+    width: 50px;
+}
+
+h3 {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: normal;
+}
+
+.mapboxgl-popup-close-button {
+  display: none;
+}
+
+.info__item div {
+  text-align: center;
+}
+
+
+.info__item .num {
+  font-size: 2rem;
+  margin-bottom: .5rem;
+}
+
+
+/* 
+
+.marker-ebike::after {
+  position: absolute;
+  display: block;
+  width: 1.2rem;
+  height: 1.2rem;
+  background-color: black;
+  border-radius: 100%;
+  top: -5px;
+  left: -5px;
+  text-align: center;
+  line-height: 1rem;
+  color: black;
+  border: 1px solid black;
+}
+*/
