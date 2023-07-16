@@ -7,11 +7,48 @@ const map = new mapboxgl.Map({
   zoom: 13, // starting zoom
 });
 
+function addBikeButtons(map) {
+  class DockButton {
+    onAdd(_map) {
+      const div = document.createElement("div");
+      div.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
+      div.innerHTML = `<button> ⚓</button>`;
+      div.addEventListener("contextmenu", (e) => e.preventDefault());
+      div.addEventListener("click", () => {
+        window.marker_type = "dock";
+
+        div.classList.add("active");
+        addStations(GEOJSON);
+      });
+
+      return div;
+    }
+  }
+  class BikeButton {
+    onAdd(_map) {
+      const div = document.createElement("div");
+      div.className = "mapboxgl-ctrl mapboxgl-ctrl-group";
+      div.innerHTML = `<button> 🚲</button>`;
+      div.addEventListener("contextmenu", (e) => e.preventDefault());
+      div.addEventListener("click", () => {
+        window.marker_type = "bike";
+
+        div.classList.add("active");
+        addStations(GEOJSON);
+      });
+
+      return div;
+    }
+  }
+  map.addControl(new DockButton(), "bottom-right");
+  map.addControl(new BikeButton(), "bottom-right");
+}
 map.on("load", setup);
 
 function setup() {
   geolocate();
   update();
+  addBikeButtons(map);
   //map.on("zoomend", zoom);
 }
 
@@ -44,13 +81,18 @@ function geolocate() {
   );
 }
 
+window.marker_type = "bike";
+
 function createMarker(feature) {
   const el = document.createElement("div");
   const station = feature.properties.station;
   if (!station) {
     return;
   }
-  let icon_name = "2";
+  let icon_name = "5";
+  if (window.marker_type == "dock") {
+    icon_name = "6";
+  }
 
   if (station.bikes_available === 0) {
     icon_name += "-empty";
@@ -63,12 +105,14 @@ function createMarker(feature) {
   } else {
     icon_name += "-normal";
   }
+  /*
   if (station.ebikes_available > 0) {
     icon_name += "-ebike";
   }
   if (station.ebikes_available >= 3) {
     icon_name += "-many-ebikes";
   }
+  */
   el.className = `marker-icon`;
   el.style.backgroundImage = `url(/icons/${icon_name}.svg)`;
   /* if zoomed out, show tiny markers
@@ -121,7 +165,9 @@ function formatTime(utc_timestamp) {
 
 function addStations(geojson) {
   /* delete all markers */
-  document.querySelectorAll(".marker").forEach((marker) => marker.remove());
+  document.querySelectorAll(".marker-icon").forEach((marker) =>
+    marker.remove()
+  );
   for (const feature of geojson.features) {
     createMarker(feature);
   }
