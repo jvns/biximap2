@@ -50,22 +50,27 @@ function createMarker(feature) {
   if (!station) {
     return;
   }
-  el.className = "marker";
+  let icon_name = "2";
+
   if (station.bikes_available === 0) {
-    el.className += " marker-empty marker-problem";
+    icon_name += "-empty";
   } else if (station.docks_available === 0) {
-    el.className += " marker-full marker-problem";
+    icon_name += "-full";
   } else if (station.bikes_available <= 3) {
-    el.className += " marker-low marker-warning";
+    icon_name += "-low";
   } else if (station.docks_available <= 3) {
-    el.className += " marker-docks-low marker-warning";
+    icon_name += "-high";
+  } else {
+    icon_name += "-normal";
   }
   if (station.ebikes_available > 0) {
-    el.className += " marker-ebike";
+    icon_name += "-ebike";
   }
   if (station.ebikes_available >= 3) {
-    el.className += " marker-many-ebikes";
+    icon_name += "-many-ebikes";
   }
+  el.className = `marker-icon`;
+  el.style.backgroundImage = `url(/icons/${icon_name}.svg)`;
   /* if zoomed out, show tiny markers
   if (map.getZoom() < 13) {
     el.className += " marker-tiny";
