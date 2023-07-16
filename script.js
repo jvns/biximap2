@@ -140,5 +140,4 @@ async function update() {
     await sleep(10);
     addStations(GEOJSON);
   }
-  geolocate();
 }
