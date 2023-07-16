@@ -3,79 +3,6 @@
     --full-color: #ff6000;
 }
 
-.marker {
-    background-image: url('mapbox-icon.png');
-    background-size: cover;
-    background-color: green;
-    width: 15px;
-    height: 40px;
-    /* border-radius: 50%; */
-    cursor: pointer;
-    border: 2px solid green;
-}
-
-.marker-warning, .marker-problem {
-    border-color: var(--low-color);
-    background-color: white;
-}
-
-.marker-warning:before, .marker-problem:before {
-    position: absolute;
-    top: 50%;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: var(--low-color);
-    content: ' ';
-}
-
-.marker-problem {
-    border-color: var(--full-color);
-}
-
-.marker-problem:before {
-    background-color: var(--full-color);
-}
-
-.marker.marker-ebike:after {
-    content: "↯";
-    color: white;
-    font-size: .8rem;
-    margin: 7px auto;
-    z-index: 1;
-}
-
-.marker.marker-many-ebikes:after {
-    content: "↯↯";
-}
-
-.marker.marker-ebike.marker-low:after {
-    color: var(--low-color);
-}
-
-/* colours for various different bike station fullness */
-
-.marker-empty:before {
-    top: 100%;
-}
-
-.marker-low:before {
-    top: 80%;
-}
-
-.marker-docks-low:before {
-    top: 20%;
-}
-
-.marker-full:before {
-    top: 0%;
-}
-
-
-.marker-ebike {
-    display: flex;
-}
-
 .mapboxgl-popup {
     max-width: 200px;
 }
@@ -113,41 +40,98 @@ h3 {
     margin-bottom: .5rem;
 }
 
-.marker.marker-tiny.marker-tiny {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-}
-
-.marker.marker-tiny.marker-tiny:after {
-    display:none;
-}
-.marker.marker-tiny.marker-tiny:before {
-    display:none;
-}
-
-
-
-/* 
-
-.marker-ebike::before {
-position: absolute;
-display: block;
-width: 1.2rem;
-height: 1.2rem;
-background-color: black;
-border-radius: 100%;
-top: -5px;
-left: -5px;
-text-align: center;
-line-height: 1rem;
-color: black;
-border: 1px solid black;
-}
- */
-
 .time {
     color: #999;
     top: 5px;
     left: 5px;
 }
+
+.marker-icon {
+    width: 50px;
+    height: 50px;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.marker-icon--low {
+    background-color: var(--low-color);
+}
+
+.marker-icon--full {
+    background-color: var(--full-color);
+}
+
+.marker-icon--low,
+.marker-icon--full {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.marker-icon--low::after,
+.marker-icon--full::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-left: 5px;
+}
+
+.marker-icon--low::after {
+    background-color: var(--low-color);
+}
+
+.marker-icon--full::after {
+    background-color: var(--full-color);
+}
+
+.marker-icon--low:hover,
+.marker-icon--full:hover {
+    transform: scale(1.2);
+}
+
+.marker-icon--low:hover::after,
+.marker-icon--full:hover::after {
+    transform: scale(1.2);
+}
+
+.marker-icon--low:hover {
+    z-index: 1;
+}
+
+.marker-icon--full:hover {
+    z-index: 2;
+}
+
+.marker-icon--low:hover~.marker-icon--low::after,
+.marker-icon--full:hover~.marker-icon--full::after {
+    transform: scale(1.2);
+}
+
+.marker-icon--low:hover~.marker-icon--low,
+.marker-icon--full:hover~.marker-icon--full {
+    transform: scale(1.2);
+}
+
+.marker-icon--low:hover~.marker-icon--low:hover::after,
+.marker-icon--full:hover~.marker-icon--full:hover::after {
+    transform: scale(1.2);
+}
+
+.marker-icon--low:hover~.marker-icon--low:hover,
+.marker-icon--full:hover~.marker-icon--full:hover {
+    transform: scale(1.2);
+}
+
+.marker-icon--low:hover~.marker-icon--low:hover~.marker-icon--low::after,
+.marker-icon--full:hover~.marker-icon--full:hover~.marker-icon--full::after {
+    transform: scale(1.2);
+}
+
+.marker-icon--low:hover~.marker-icon
+
+

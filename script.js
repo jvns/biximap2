@@ -12,7 +12,6 @@ map.on("load", setup);
 function setup() {
   geolocate();
   update();
-  //map.on("zoomend", zoom);
 }
 
 function zoom() {
@@ -50,28 +49,33 @@ function createMarker(feature) {
   if (!station) {
     return;
   }
-  el.className = "marker";
+  let icon_name = "marker";
+
+  const percentage = station.bikes_available /
+    (station.bikes_available + station.docks_available);
+  /* classify into 0/20/40/50/60/80/100 */
   if (station.bikes_available === 0) {
-    el.className += " marker-empty marker-problem";
+    icon_name += "-0";
   } else if (station.docks_available === 0) {
-    el.className += " marker-full marker-problem";
-  } else if (station.bikes_available <= 3) {
-    el.className += " marker-low marker-warning";
-  } else if (station.docks_available <= 3) {
-    el.className += " marker-docks-low marker-warning";
-  }
-  if (station.ebikes_available > 0) {
-    el.className += " marker-ebike";
+    icon_name += "-100";
+  } else if (station.docks_available < 3) {
+    icon_name += "-80";
+  } else if (station.bikes_available < 3) {
+    icon_name += "-20";
+  } else if (percentage <= 0.4) {
+    icon_name += "-40";
+  } else if (percentage < 0.6) {
+    icon_name += "-50";
+  } else {
+    icon_name += "-60";
   }
   if (station.ebikes_available >= 3) {
-    el.className += " marker-many-ebikes";
+    icon_name += "-many-ebike";
+  } else if (station.ebikes_available > 0) {
+    icon_name += "-ebike";
   }
-  /* if zoomed out, show tiny markers
-  if (map.getZoom() < 13) {
-    el.className += " marker-tiny";
-  }
-  */
-
+  el.className = `marker-icon`;
+  el.style.backgroundImage = `url(/icons/${icon_name}.svg)`;
   // make a marker for each feature and add to the map
   new mapboxgl.Marker(el).setLngLat(feature.geometry.coordinates).setPopup(
     new mapboxgl.Popup({ offset: 25 }) // add popups
@@ -116,7 +120,9 @@ function formatTime(utc_timestamp) {
 
 function addStations(geojson) {
   /* delete all markers */
-  document.querySelectorAll(".marker").forEach((marker) => marker.remove());
+  document.querySelectorAll(".marker-icon").forEach((marker) =>
+    marker.remove()
+  );
   for (const feature of geojson.features) {
     createMarker(feature);
   }
