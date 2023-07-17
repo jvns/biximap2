@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"compress/gzip"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -14,14 +12,7 @@ func main() {
 	go cacheLoop()
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		/* if accept-encoding string contains gzip */
-		if bytes.Contains([]byte(r.Header.Get("Accept-Encoding")), []byte("gzip")) {
-			w.Header().Set("Content-Encoding", "gzip")
-			w.Write(compress(RESPONSE))
-		} else {
-			w.Write(RESPONSE)
-		}
+		w.Write(RESPONSE)
 	})
 	err := http.ListenAndServe(":8999", nil)
 	if err != nil {
@@ -34,14 +25,6 @@ func cacheLoop() {
 		fetch()
 		time.Sleep(30 * time.Second)
 	}
-}
-
-func compress(decoded []byte) []byte {
-	var b bytes.Buffer
-	gz := gzip.NewWriter(&b)
-	gz.Write(decoded)
-	gz.Close()
-	return b.Bytes()
 }
 
 func fetch() {
