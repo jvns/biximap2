@@ -110,9 +110,9 @@ class MapboxMap {
   }
 
   async run() {
-    /* update times every 10 seconds, update data every 2 minutes */
+    /* update times every 10 seconds, update data every minute */
     while (true) {
-      for (let i = 0; i < 12; i++ ) {
+      for (let i = 0; i < 6; i++ ) {
         this.updateStations();
         await sleep(10);
       }
