@@ -13,7 +13,7 @@ self.addEventListener('activate', function (event) {
 
 self.addEventListener('fetch', function(event) {
   const url = event.request.url;
-  if(url.startsWith('https://') && (url.includes('marker-') || url.includes('tiles.mapbox.com') || url.includes('api.mapbox.com'))) {
+  if(url.startsWith('https://') && (url.includes('localhost') || url.includes('bixi.jvns.ca') || url.includes('tiles.mapbox.com') || url.includes('api.mapbox.com'))) {
     event.respondWith(
       caches.match(event.request).then(function(resp) {
         if (resp) {
