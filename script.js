@@ -1,3 +1,11 @@
+async function setupSW() {
+  if ("serviceWorker" in navigator) {
+    const worker = await navigator.serviceWorker.register("/worker.js")
+    console.log("Service Worker registered: ", worker);
+  }
+}
+setupSW();
+
 mapboxgl.accessToken =
   "pk.eyJ1IjoianZucyIsImEiOiJjbGs0M2hiYncwN2U4M2NwZTdkNWU0bXpmIn0.lCiDKbpNKL0qWumE3NZIwA";
 const map = new mapboxgl.Map({
@@ -147,3 +155,5 @@ async function update() {
     addStations(GEOJSON);
   }
 }
+
+
