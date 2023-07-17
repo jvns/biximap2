@@ -75,6 +75,7 @@ function sleep(seconds) {
 
 class MapboxMap {
   constructor() {
+    this.stations = JSON.parse(localStorage.getItem("stations")) || undefined;
     this.setup().then(() => this.run());
   }
 
@@ -87,7 +88,15 @@ class MapboxMap {
       center: [-73.588319, 45.514197], // starting position [lng, lat]
       zoom: 13, // starting zoom
     });
-    await Promise.all([waitLoaded(this.map), this.fetchStations()])
+    await waitLoaded(this.map);
+    if (this.stations) {
+      this.createStations();
+      await this.fetchStations();
+    } else {
+      await this.fetchStations();
+      this.createStations();
+    }
+
     /* set up geolocation */
     this.map.addControl(
       new mapboxgl.GeolocateControl({
@@ -98,7 +107,6 @@ class MapboxMap {
         showUserHeading: true,
       }),
     );
-    this.createStations();
   }
 
   async run() {
@@ -117,6 +125,8 @@ class MapboxMap {
       "https://bixicache.jvns.ca",
     );
     this.stations = await response.json();
+    // save stations to local storage
+    localStorage.setItem("stations", JSON.stringify(this.stations));
   }
 
   createStations() {
