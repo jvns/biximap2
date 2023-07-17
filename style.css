@@ -52,6 +52,7 @@ h3 {
     background-position: 50% 50%;
     background-repeat: no-repeat;
     background-size: contain;
+    top: -25px;
 }
 
 .marker-icon--low {
