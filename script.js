@@ -75,8 +75,7 @@ function sleep(seconds) {
 
 class MapboxMap {
   constructor() {
-    this.setup();
-    this.run();
+    this.setup().then(() => this.run());
   }
 
   async setup() {
