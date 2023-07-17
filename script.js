@@ -107,6 +107,7 @@ class MapboxMap {
         showUserHeading: true,
       }),
     );
+    this.map.addControl(new mapboxgl.NavigationControl());
   }
 
   async run() {
