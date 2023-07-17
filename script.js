@@ -114,7 +114,7 @@ class MapboxMap {
 
   async fetchStations() {
     const response = await fetch(
-      "https://layer.bicyclesharing.net/map/v1/mtl/map-inventory",
+      "https://bixicache.jvns.ca",
     );
     this.stations = await response.json();
   }
