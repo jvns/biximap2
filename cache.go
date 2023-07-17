@@ -15,7 +15,8 @@ func main() {
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		if r.Header.Get("Accept-Encoding") == "gzip" {
+		/* if accept-encoding string contains gzip */
+		if bytes.Contains([]byte(r.Header.Get("Accept-Encoding")), []byte("gzip")) {
 			w.Header().Set("Content-Encoding", "gzip")
 			w.Write(compress(RESPONSE))
 		} else {
