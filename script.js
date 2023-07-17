@@ -1,64 +1,13 @@
-async function setupSW() {
-  if ("serviceWorker" in navigator) {
-    const worker = await navigator.serviceWorker.register("/worker.js")
-    console.log("Service Worker registered: ", worker);
-  }
-}
-setupSW();
-
-mapboxgl.accessToken =
-  "pk.eyJ1IjoianZucyIsImEiOiJjbGs0M2hiYncwN2U4M2NwZTdkNWU0bXpmIn0.lCiDKbpNKL0qWumE3NZIwA";
-const map = new mapboxgl.Map({
-  container: "map", // container ID
-  style: "mapbox://styles/mapbox/streets-v12?optimize=true", // style URL
-  center: [-73.588319, 45.514197], // starting position [lng, lat]
-  zoom: 13, // starting zoom
-});
-
-map.on("load", setup);
-
-function setup() {
-  geolocate();
-  update();
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/worker.js").then(() => {console.log("Service Worker Registered");});
 }
 
-function zoom() {
-  let zoom_status = undefined;
-  if (map.getZoom() < 13) {
-    zoom_status = "zoomed_out";
-  } else {
-    zoom_status = "zoomed_in";
-  }
-  if (window.zoom_status !== zoom_status) {
-    addStations(GEOJSON);
-    window.zoom_status = zoom_status;
-  }
+function waitLoaded(map) {
+  return new Promise((resolve) => map.on("load", resolve));
 }
 
-window.GEOJSON = undefined;
-
-function geolocate() {
-  map.addControl(
-    new mapboxgl.GeolocateControl({
-      positionOptions: {
-        enableHighAccuracy: true,
-      },
-      // When active the map will receive updates to the device's location as it changes.
-      // trackUserLocation: true,
-      // Draw an arrow next to the location dot to indicate which direction the device is heading.
-      showUserHeading: true,
-    }),
-  );
-}
-
-function createMarker(feature) {
-  const el = document.createElement("div");
-  const station = feature.properties.station;
-  if (!station) {
-    return;
-  }
+function iconName(station) {
   let icon_name = "marker";
-
   const percentage = station.bikes_available /
     (station.bikes_available + station.docks_available);
   /* classify into 0/20/40/50/60/80/100 */
@@ -82,13 +31,11 @@ function createMarker(feature) {
   } else if (station.ebikes_available > 0) {
     icon_name += "-ebike";
   }
-  el.className = `marker-icon`;
-  el.style.backgroundImage = `url(/icons/${icon_name}.svg)`;
-  // make a marker for each feature and add to the map
-  new mapboxgl.Marker(el).setLngLat(feature.geometry.coordinates).setPopup(
-    new mapboxgl.Popup({ offset: 25 }) // add popups
-      .setHTML(
-        `
+  return icon_name;
+}
+
+function popupContents(station) {
+  return `
         <div class="time">${formatTime(station.last_reported)}</div>
         <h3>${station.name}</h3><p>
             <div class="info">
@@ -104,11 +51,7 @@ function createMarker(feature) {
                     <div class="num"> ${station.ebikes_available || 0} </div>
                     <div class="desc"> Ebikes </div>
                 </div>
-            </div>
-
-            `,
-      ),
-  ).addTo(map);
+            </div>`;
 }
 
 function formatTime(utc_timestamp) {
@@ -126,34 +69,107 @@ function formatTime(utc_timestamp) {
   return `${minutes} minutes ago`;
 }
 
-function addStations(geojson) {
-  /* delete all markers */
-  document.querySelectorAll(".marker-icon").forEach((marker) =>
-    marker.remove()
-  );
-  for (const feature of geojson.features) {
-    createMarker(feature);
-  }
-}
-
 function sleep(seconds) {
   return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
 }
 
-async function update() {
-  setTimeout(update, 120 * 1000); /* run every 2 minutes */
-
-  console.log("refreshing...");
-  const response = await fetch(
-    "https://layer.bicyclesharing.net/map/v1/mtl/map-inventory",
-  );
-  window.GEOJSON = await response.json();
-  addStations(GEOJSON);
-  /* every 10 seconds for 2 minutes, refresh the data */
-  for (let i = 0; i < 12; i++) {
-    await sleep(10);
-    addStations(GEOJSON);
+class MapboxMap {
+  constructor() {
+    this.setup();
+    this.run();
   }
+
+  async setup() {
+    mapboxgl.accessToken = "pk.eyJ1IjoianZucyIsImEiOiJjbGs0M2hiYncwN2U4M2NwZTdkNWU0bXpmIn0.lCiDKbpNKL0qWumE3NZIwA";
+    this.markers = {}
+    this.map = new mapboxgl.Map({
+      container: "map", // container ID
+      style: "mapbox://styles/mapbox/streets-v12?optimize=true", // style URL
+      center: [-73.588319, 45.514197], // starting position [lng, lat]
+      zoom: 13, // starting zoom
+    });
+    await Promise.all([waitLoaded(this.map), this.fetchStations()])
+    /* set up geolocation */
+    this.map.addControl(
+      new mapboxgl.GeolocateControl({
+        positionOptions: {
+          enableHighAccuracy: true,
+        },
+        // trackUserLocation: true,
+        showUserHeading: true,
+      }),
+    );
+    this.createStations();
+  }
+
+  async run() {
+    /* update times every 10 seconds, update data every 2 minutes */
+    while (true) {
+      for (let i = 0; i < 12; i++ ) {
+        this.updateStations();
+        await sleep(10);
+      }
+      await this.fetchStations();
+    }
+  }
+
+  async fetchStations() {
+    const response = await fetch(
+      "https://layer.bicyclesharing.net/map/v1/mtl/map-inventory",
+    );
+    this.stations = await response.json();
+  }
+
+  createStations() {
+    for (const feature of this.stations.features) {
+      this.createMarker(feature);
+    }
+  }
+
+  updateStations() {
+    for (const feature of this.stations.features) {
+      this.updateMarker(feature);
+    }
+  }
+
+  updateMarker(feature) {
+    const station = feature.properties.station;
+    if (!station) {
+      return;
+    }
+    const marker = this.markers[station.id];
+    if (!marker) {
+      return;
+    }
+    const el = marker.getElement();
+    /* set background image */
+    el.style.backgroundImage = `url(./icons/${iconName(station)}.svg)`;
+    /* set popup */
+    const popup = marker.getPopup();
+    popup.setHTML(popupContents(station));
+  }
+
+  createMarker(feature) {
+    const el = document.createElement("div");
+    const station = feature.properties.station;
+    if (!station) {
+      return;
+    }
+
+    const icon_name = iconName(station);
+    el.className = `marker-icon`;
+    el.style.backgroundImage = `url(/icons/${icon_name}.svg)`;
+    // make a marker for each feature and add to the map
+    const marker = new mapboxgl.Marker(el).setLngLat(feature.geometry.coordinates).setPopup(
+      new mapboxgl.Popup({ offset: 25 }) // add popups
+      .setHTML(popupContents(station)),
+    )
+    marker.addTo(this.map);
+    this.markers[station.id] = marker;
+    return marker;
+  }
+
 }
 
 
+new MapboxMap();
