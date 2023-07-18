@@ -34,9 +34,9 @@ function iconName(station) {
   return icon_name;
 }
 
-function popupContents(station) {
+function popupContents(station, updated) {
   return `
-        <div class="time">${formatTime(station.last_reported)}</div>
+        <div class="time">${formatTime(updated)}</div>
         <h3>${station.name}</h3><p>
             <div class="info">
                <div class="info__item">
@@ -57,9 +57,10 @@ function popupContents(station) {
 function formatTime(utc_timestamp) {
   /* format in a nice way, like x seconds/minutes ago */
   const now = new Date();
-  const timestamp = new Date(utc_timestamp * 1000);
+  const timestamp = new Date(utc_timestamp);
   const diff = now - timestamp;
-  const seconds = Math.floor(diff / 1000);
+  /* +15 is a lie, the cache actually fetches every 30 seconds */
+  const seconds = Math.floor(diff / 1000) + 15;
   const minutes = Math.floor(seconds / 60);
   if (minutes == 1) {
     return "1 minute ago";
@@ -145,6 +146,7 @@ class MapboxMap {
       "https://bixicache.jvns.ca",
     );
     this.stations = await response.json();
+    this.stations.updated = new Date().getTime();
     // save stations to local storage
     localStorage.setItem("stations", JSON.stringify(this.stations));
   }
@@ -175,7 +177,7 @@ class MapboxMap {
     el.style.backgroundImage = `url(./icons/${iconName(station)}.svg)`;
     /* set popup */
     const popup = marker.getPopup();
-    popup.setHTML(popupContents(station));
+    popup.setHTML(popupContents(station, this.stations.updated));
   }
 
   createMarker(feature) {
