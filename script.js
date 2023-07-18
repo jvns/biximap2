@@ -130,13 +130,33 @@ class MapboxMap {
       type: "geojson",
       data: this.lanes,
     });
+    /* options: bicycle friendly / dedicated / protected */
     this.map.addLayer({
       id: "lanes",
       type: "line",
       source: "lanes",
       paint: {
-        "line-color": "#038803",
-        "line-width": 2.5,
+        "line-color": [
+          "match",
+          ["get", "lane_type"],
+          "protected",
+          "#2d659a",
+          "#9bb6cf",
+        ],
+        "line-width": [
+          "match",
+          ["get", "lane_type"],
+          "protected",
+          3,
+          2,
+        ],
+        "line-dasharray": [
+          "match",
+          ["get", "lane_type"],
+          "bicycle_friendly",
+          ["literal", [1,1]],
+          ["literal", [1]],
+        ],
       },
     });
   }
