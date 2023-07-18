@@ -94,6 +94,11 @@ class MapboxMap {
       zoom: state.zoom || 13,
       bearing: state.bearing || 0,
     });
+    /* no "poi-label" layer */
+    this.map.on("style.load", () => {
+      this.map.removeLayer("poi-label");
+    })
+
     await waitLoaded(this.map);
     this.fetchLanes();
     if (this.stations) {
