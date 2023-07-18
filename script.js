@@ -89,6 +89,7 @@ class MapboxMap {
       zoom: 13, // starting zoom
     });
     await waitLoaded(this.map);
+    this.fetchLanes();
     if (this.stations) {
       this.createStations();
       await this.fetchStations();
@@ -119,6 +120,24 @@ class MapboxMap {
       }
       await this.fetchStations();
     }
+  }
+
+  async fetchLanes() {
+    const response = await fetch("https://hub.bicyclesharing.net/map/v1/mtl/bike-lanes");
+    this.lanes = await response.json();
+    this.map.addSource("lanes", {
+      type: "geojson",
+      data: this.lanes,
+    });
+    this.map.addLayer({
+      id: "lanes",
+      type: "line",
+      source: "lanes",
+      paint: {
+        "line-color": "#038803",
+        "line-width": 2.5,
+      },
+    });
   }
 
   async fetchStations() {
