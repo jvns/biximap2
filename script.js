@@ -83,11 +83,15 @@ class MapboxMap {
   async setup() {
     mapboxgl.accessToken = "pk.eyJ1IjoianZucyIsImEiOiJjbGs0M2hiYncwN2U4M2NwZTdkNWU0bXpmIn0.lCiDKbpNKL0qWumE3NZIwA";
     this.markers = {}
+    /* restore latlng from local storage */
+    const state = this.getMapState();
+
     this.map = new mapboxgl.Map({
       container: "map", // container ID
       style: "mapbox://styles/mapbox/streets-v12?optimize=true", // style URL
-      center: [-73.588319, 45.514197], // starting position [lng, lat]
-      zoom: 13, // starting zoom
+      // starting position / zoom
+      center: state.center,
+      zoom: state.zoom,
     });
     await waitLoaded(this.map);
     this.fetchLanes();
@@ -110,7 +114,26 @@ class MapboxMap {
       }),
     );
     this.map.addControl(new mapboxgl.NavigationControl());
+    /* save state when map is moved */
+    this.map.on("moveend", () => this.saveMapState());
+    this.map.on("zoomend", () => this.saveMapState());
   }
+
+
+  saveMapState() {
+    const state = {
+      "center": this.map.getCenter(),
+      "zoom": this.map.getZoom(),
+    };
+    localStorage.setItem("map_state", JSON.stringify(state));
+  }
+
+  getMapState() {
+    const state = JSON.parse(localStorage.getItem("map_state"));
+    return state || {zoom: 13, center: [-73.588319, 45.514197]}
+  }
+
+
 
   async run() {
     /* update times every 10 seconds, update data every minute */
